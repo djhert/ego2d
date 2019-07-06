@@ -6,7 +6,7 @@ const (
 	NAME       = "eGo Game Engine 2D"
 	MAJORVER   = 0
 	MINORVER   = 1
-	RELEASEVER = 1
+	RELEASEVER = 5
 )
 
 func Version() string {

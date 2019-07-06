@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	ego.Create(1920, 1080, ego.FULLSCREEN, "example")
+	ego.Create(1920, 1080, ego.WINDOWED, "example")
 	rand.Seed(time.Now().UnixNano())
 	ego.ActiveScene = &exampleScene{}
 	err := ego.Run()
@@ -32,6 +32,7 @@ type exampleScene struct {
 }
 
 func (e *exampleScene) Update() {
+	//time.Sleep(100000 * time.Microsecond)
 	for i := range e.objs {
 		e.objs[i].Update()
 	}
@@ -49,14 +50,13 @@ func (e *exampleScene) Draw() {
 }
 
 func (e *exampleScene) Destroy() {
-	for i := range e.objs {
-		e.objs[i].Sprite.Destroy()
-	}
 }
 
 func (e *exampleScene) Start() {
 	var err error
 	e.numObjects = 1000
+	e.B = 255
+
 	e.objs = make([]object, e.numObjects)
 	for i := 0; i < e.numObjects; i++ {
 		e.objs[i] = NewObject()

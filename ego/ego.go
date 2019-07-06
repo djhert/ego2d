@@ -39,6 +39,8 @@ var (
 	DeltaTime float32
 	FPS       int32
 
+	fpsTarget uint32
+
 	// counter for FPS
 	frames    int32
 	closeChan chan bool
@@ -50,6 +52,8 @@ func init() {
 
 	wg = &sync.WaitGroup{}
 	closeChan = make(chan bool, 1)
+
+	fpsTarget = 60
 }
 
 func Create(w, h int32, wm WinMode, n string) {
@@ -129,6 +133,10 @@ func run() error {
 
 	isRunning = true
 
+	if AssetAutoload {
+		autoload()
+	}
+
 	ActiveScene.Start()
 
 	wg.Add(3)
@@ -159,7 +167,12 @@ counter:
 }
 
 func graphics() {
+	var startTicks uint32
+	var endTicks uint32
+	var deltaTicks uint32
+
 	for isRunning {
+		startTicks = sdl.GetTicks()
 		sdl.Do(func() {
 			Renderer.SetDrawColor(ActiveScene.GetBackground())
 			Renderer.Clear()
@@ -168,31 +181,39 @@ func graphics() {
 		ActiveScene.Draw()
 		sdl.Do(func() {
 			Renderer.Present()
-			//sdl.Delay(1000 / 60)
 		})
+		endTicks = sdl.GetTicks()
+		deltaTicks = endTicks - startTicks
+		if deltaTicks < 1000/fpsTarget {
+			sdl.Delay((1000 / fpsTarget) - deltaTicks)
+		}
 		atomic.AddInt32(&frames, 1)
 	}
 	wg.Done()
 }
 
 func logic() {
-	//deltaTime calc
-	var last uint64
-	var now uint64
+	var startTicks uint32
+	var endTicks uint32
+	var deltaTicks uint32
 
-	sdl.Do(func() {
-		last = sdl.GetPerformanceCounter()
-	})
+	var lastTicks uint32
 
 	for isRunning {
 		sdl.Do(func() {
-			now = sdl.GetPerformanceCounter()
+			startTicks = sdl.GetTicks()
 		})
-		DeltaTime = float32((now-last)/(sdl.GetPerformanceFrequency()/1000.0)) / 1000.0
-		last = now
+
+		DeltaTime = float32(startTicks-lastTicks) / 1000.0
+		lastTicks = startTicks
 
 		ActiveScene.Update()
-		sdl.Delay(1000 / 60)
+		endTicks = sdl.GetTicks()
+		deltaTicks = endTicks - startTicks
+
+		if deltaTicks < 1000/fpsTarget {
+			sdl.Delay((1000 / fpsTarget) - deltaTicks)
+		}
 	}
 
 	wg.Done()

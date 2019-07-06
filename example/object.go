@@ -16,22 +16,33 @@ type object struct {
 }
 
 func NewObject() object {
-	obj, _ := sprite.LoadPNG("./deepfryface.png")
-	obj.Position.SetXY(rand.Int31n(ego.Width), rand.Int31n(ego.Height))
-	obj.Position.Rotation.Set(float64(rand.Int31n(360)))
-	return object{obj, rand.Int31n(10), rand.Int31n(10), rand.Int31n(6)}
+	obj := sprite.New("player/deepfryface")
+	obj.SetXY(rand.Int31n(ego.Width), rand.Int31n(ego.Height))
+	obj.Rotation.Set(float64(rand.Int31n(360)))
+
+	return object{obj, rand.Int31n(9) + 1, rand.Int31n(9) + 1, rand.Int31n(5) + 1}
 }
 
 func (o *object) Update() {
-	if o.Sprite.Position.GetX() >= ego.Width || o.Sprite.Position.GetX() <= 0 {
+	if o.Sprite.GetX() >= (ego.Width - o.Sprite.GetW()) {
 		o.speedX *= -1
+		o.Sprite.SetX(ego.Width - o.Sprite.GetW())
+
+	} else if o.Sprite.GetX() <= 0 {
+		o.speedX *= -1
+		o.Sprite.SetX(0)
 	}
-	if o.Sprite.Position.GetY() >= ego.Height || o.Sprite.Position.GetY() <= 0 {
+	if o.Sprite.GetY() >= (ego.Height - o.Sprite.GetH()) {
 		o.speedY *= -1
+		o.Sprite.SetY(ego.Height - o.Sprite.GetH())
+	} else if o.Sprite.GetY() <= 0 {
+		o.speedY *= -1
+		o.Sprite.SetY(0)
 	}
-	o.Sprite.Position.AddX(o.speedX)
-	o.Sprite.Position.AddY(o.speedY)
-	o.Sprite.Position.Rotation.Add(float64(o.speedRot))
+
+	o.Sprite.AddX(o.speedX)
+	o.Sprite.AddY(o.speedY)
+	o.Sprite.Rotation.Add(float64(o.speedRot))
 }
 
 func (o *object) Draw() {
