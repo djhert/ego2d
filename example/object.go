@@ -8,36 +8,42 @@ import (
 )
 
 type object struct {
-	Sprite *sprite.Sprite
+	*sprite.Sprite
 
 	speedX   int32
 	speedY   int32
 	speedRot int32
+
+	index int
 }
 
-func NewObject() object {
-	obj := sprite.New("player/deepfryface")
-	obj.SetXY(rand.Int31n(ego.Width), rand.Int31n(ego.Height))
-	obj.Rotation.Set(float64(rand.Int31n(360)))
-
-	return object{obj, rand.Int31n(9) + 1, rand.Int31n(9) + 1, rand.Int31n(5) + 1}
+func NewObject() *object {
+	obj := &object{
+		Sprite: sprite.New(),
+	}
+	return obj
 }
 
 func (o *object) Update() {
 	if o.Sprite.GetX() >= (ego.Width - o.Sprite.GetW()) {
 		o.speedX *= -1
-		o.Sprite.SetX(ego.Width - o.Sprite.GetW())
-
+		o.Sprite.SetX((ego.Width - o.Sprite.GetW()) - 5)
+		//	ego.Audio.PaySound("bump")
 	} else if o.Sprite.GetX() <= 0 {
 		o.speedX *= -1
-		o.Sprite.SetX(0)
+		o.Sprite.SetX(5)
+		//	ego.Audio.PaySound("bump")
 	}
+
 	if o.Sprite.GetY() >= (ego.Height - o.Sprite.GetH()) {
 		o.speedY *= -1
-		o.Sprite.SetY(ego.Height - o.Sprite.GetH())
+		o.Sprite.SetY((ego.Height - o.Sprite.GetH()) - 5)
+		//	ego.Audio.PaySound("bump")
+
 	} else if o.Sprite.GetY() <= 0 {
 		o.speedY *= -1
-		o.Sprite.SetY(0)
+		o.Sprite.SetY(5)
+		//	ego.Audio.PaySound("bump")
 	}
 
 	o.Sprite.AddX(o.speedX)
@@ -45,6 +51,10 @@ func (o *object) Update() {
 	o.Sprite.Rotation.Add(float64(o.speedRot))
 }
 
-func (o *object) Draw() {
-	o.Sprite.Draw()
+func (o *object) Start() {
+	o.SetXY(rand.Int31n(ego.Width), rand.Int31n(ego.Height))
+	o.Rotation.Set(float64(rand.Int31n(360)))
+	o.speedX = rand.Int31n(9) + 1
+	o.speedY = rand.Int31n(9) + 1
+	o.speedRot = rand.Int31n(5) + 1
 }

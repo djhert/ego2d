@@ -5,8 +5,8 @@ import "fmt"
 const (
 	NAME       = "eGo Game Engine 2D"
 	MAJORVER   = 0
-	MINORVER   = 1
-	RELEASEVER = 5
+	MINORVER   = 2
+	RELEASEVER = 0
 )
 
 func Version() string {

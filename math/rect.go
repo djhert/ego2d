@@ -1,74 +1,165 @@
 package math
 
 import (
-	"sync/atomic"
+	"sync"
 
 	"github.com/veandco/go-sdl2/sdl"
 )
 
 type Rect struct {
-	Pos2
-	w int32
-	h int32
+	rect *sdl.Rect
+	mx   *sync.RWMutex
 }
 
 func NewRect(x, y, w, h int32) Rect {
-	return Rect{Pos2: Pos2{x: x, y: y}, w: w, h: h}
+	return Rect{
+		rect: new(sdl.Rect),
+		mx:   new(sync.RWMutex),
+	}
 }
 
-func (p *Rect) SetW(w int32) {
-	atomic.StoreInt32(&p.w, w)
+func (r *Rect) SetX(x int32) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+	r.rect.X = x
 }
 
-func (p *Rect) SetH(h int32) {
-	atomic.StoreInt32(&p.h, h)
+func (r *Rect) SetY(y int32) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+	r.rect.Y = y
 }
 
-func (p *Rect) SetWH(w, h int32) {
-	atomic.StoreInt32(&p.w, w)
-	atomic.StoreInt32(&p.h, h)
+func (r *Rect) SetXY(x, y int32) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+	r.rect.X = x
+	r.rect.Y = y
 }
 
-func (p *Rect) SetRect(s Rect) {
-	atomic.StoreInt32(&p.w, s.GetW())
-	atomic.StoreInt32(&p.h, s.GetH())
+func (r *Rect) SetPos(s Rect) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+	r.rect.X = s.GetX()
+	r.rect.Y = s.GetY()
 }
 
-func (p *Rect) GetW() int32 {
-	return atomic.LoadInt32(&p.w)
+func (r *Rect) GetX() int32 {
+	r.mx.RLock()
+	defer r.mx.RUnlock()
+	return r.rect.X
 }
 
-func (p *Rect) GetH() int32 {
-	return atomic.LoadInt32(&p.h)
+func (r *Rect) GetY() int32 {
+	r.mx.RLock()
+	defer r.mx.RUnlock()
+	return r.rect.Y
 }
 
-func (p *Rect) GetWH() (int32, int32) {
-	return atomic.LoadInt32(&p.w), atomic.LoadInt32(&p.h)
+func (r *Rect) GetXY() (int32, int32) {
+	r.mx.RLock()
+	defer r.mx.RUnlock()
+	return r.rect.X, r.rect.Y
 }
 
-func (p *Rect) AddW(w int32) {
-	atomic.AddInt32(&p.w, w)
+func (r *Rect) AddX(x int32) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+	r.rect.X += x
 }
 
-func (p *Rect) AddH(h int32) {
-	atomic.AddInt32(&p.h, h)
+func (r *Rect) AddY(y int32) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+	r.rect.Y += y
 }
 
-func (p *Rect) AddWH(w, h int32) {
-	atomic.AddInt32(&p.w, w)
-	atomic.AddInt32(&p.h, h)
+func (r *Rect) AddXY(x, y int32) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+	r.rect.X += x
+	r.rect.Y += y
 }
 
-func (p *Rect) AddRect(s Rect) {
-	atomic.AddInt32(&p.w, s.GetW())
-	atomic.AddInt32(&p.h, s.GetH())
+func (r *Rect) SetW(w int32) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+	r.rect.W = w
 }
 
-func (p *Rect) Equals(s Rect) bool {
-	if p.GetX() == s.GetX() {
-		if p.GetY() == s.GetY() {
-			if p.GetW() == s.GetW() {
-				if p.GetH() == s.GetH() {
+func (r *Rect) SetH(h int32) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+	r.rect.H = h
+}
+
+func (r *Rect) SetWH(w, h int32) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+	r.rect.W = w
+	r.rect.H = h
+}
+
+func (r *Rect) SetXYWH(x, y, w, h int32) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+	r.rect.X = x
+	r.rect.Y = y
+	r.rect.W = w
+	r.rect.H = h
+}
+
+func (r *Rect) SetRect(s Rect) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+	r.rect.X, r.rect.Y = s.GetXY()
+	r.rect.W, r.rect.H = s.GetWH()
+}
+
+func (r *Rect) GetW() int32 {
+	r.mx.RLock()
+	defer r.mx.RUnlock()
+	return r.rect.W
+}
+
+func (r *Rect) GetH() int32 {
+	r.mx.RLock()
+	defer r.mx.RUnlock()
+	return r.rect.H
+}
+
+func (r *Rect) GetWH() (int32, int32) {
+	r.mx.RLock()
+	defer r.mx.RUnlock()
+	return r.rect.W, r.rect.H
+}
+
+func (r *Rect) AddW(w int32) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+	r.rect.W += w
+}
+
+func (r *Rect) AddH(h int32) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+	r.rect.H += h
+}
+
+func (r *Rect) AddWH(w, h int32) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+	r.rect.W += w
+	r.rect.H += h
+}
+
+func (r *Rect) Equals(s Rect) bool {
+	r.mx.RLock()
+	defer r.mx.RUnlock()
+	if r.GetX() == s.GetX() {
+		if r.GetY() == s.GetY() {
+			if r.GetW() == s.GetW() {
+				if r.GetH() == s.GetH() {
 					return true
 				}
 			}
@@ -77,6 +168,8 @@ func (p *Rect) Equals(s Rect) bool {
 	return false
 }
 
-func (p *Rect) SDLRect() *sdl.Rect {
-	return &sdl.Rect{X: p.GetX(), Y: p.GetY(), W: p.GetW(), H: p.GetH()}
+func (r *Rect) SDLRect() *sdl.Rect {
+	r.mx.RLock()
+	defer r.mx.RUnlock()
+	return r.rect
 }

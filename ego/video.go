@@ -66,10 +66,10 @@ func getDisplays() error {
 			Log.LogError(1, err)
 			return err
 		}
-		outd := display{}
-		outd.SetXY(r.X, r.Y)
-		outd.SetWH(r.W, r.H)
-		outd.name = s
+		outd := display{
+			Rect: math.NewRect(r.X, r.Y, r.W, r.H),
+			name: s,
+		}
 		displays = append(displays, outd)
 	}
 

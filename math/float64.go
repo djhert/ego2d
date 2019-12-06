@@ -1,29 +1,35 @@
 package math
 
 import (
-	"math"
-	"sync/atomic"
+	"sync"
 )
 
 type AtomicFloat struct {
-	v uint64
+	v  float64
+	mx *sync.RWMutex
 }
 
 func NewAtomicFloat(f float64) AtomicFloat {
-	return AtomicFloat{math.Float64bits(f)}
+	return AtomicFloat{
+		v:  f,
+		mx: new(sync.RWMutex),
+	}
 }
 
 func (f *AtomicFloat) Set(n float64) {
-	atomic.StoreUint64(&f.v, math.Float64bits(n))
+	f.mx.Lock()
+	defer f.mx.Unlock()
+	f.v = n
 }
 
 func (f *AtomicFloat) Get() float64 {
-	return math.Float64frombits(atomic.LoadUint64(&f.v))
+	f.mx.RLock()
+	defer f.mx.RUnlock()
+	return f.v
 }
 
-func (f *AtomicFloat) Add(n float64) float64 {
-	o := f.Get() + n
-	f.Set(o)
-	return o
+func (f *AtomicFloat) Add(n float64) {
+	f.mx.Lock()
+	defer f.mx.Unlock()
+	f.v += n
 }
-
