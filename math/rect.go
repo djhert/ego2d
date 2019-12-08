@@ -13,8 +13,13 @@ type Rect struct {
 
 func NewRect(x, y, w, h int32) Rect {
 	return Rect{
-		rect: new(sdl.Rect),
-		mx:   new(sync.RWMutex),
+		rect: &sdl.Rect{
+			X: x,
+			Y: y,
+			W: w,
+			H: h,
+		},
+		mx: new(sync.RWMutex),
 	}
 }
 

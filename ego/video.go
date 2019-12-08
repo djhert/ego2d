@@ -1,6 +1,8 @@
 package ego
 
 import (
+	"fmt"
+
 	"github.com/hlfstr/ego2d/math"
 	"github.com/veandco/go-sdl2/sdl"
 )
@@ -47,6 +49,10 @@ func (w WinMode) mode() uint32 {
 type display struct {
 	math.Rect
 	name string
+}
+
+func (d *display) String() string {
+	return fmt.Sprintf("Name: %s | X: %d | Y: %d | Width: %d | Height %d |\n", d.name, d.GetX(), d.GetY(), d.GetW(), d.GetH())
 }
 
 func getDisplays() error {

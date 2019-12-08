@@ -7,11 +7,18 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
+const (
+	NONE int = iota
+	HORIZONTAL
+	VERTICAL
+)
+
 type Sprite struct {
 	*ego.Object
 
 	textureRegion math.Rect
 	texture       *sdl.Texture
+	flip          sdl.RendererFlip
 }
 
 func New() *Sprite {
@@ -19,6 +26,7 @@ func New() *Sprite {
 		Object:        ego.NewObject(),
 		textureRegion: math.NewRect(0, 0, 0, 0),
 		texture:       nil,
+		flip:          sdl.FLIP_NONE,
 	}
 	return out
 }
@@ -26,7 +34,7 @@ func New() *Sprite {
 func (s *Sprite) Draw() {
 	if s.texture != nil {
 		sdl.Do(func() {
-			ego.Renderer.CopyEx(s.texture, s.textureRegion.SDLRect(), s.SDLRect(), s.Rotation.Get(), s.Center.SDLPoint(), sdl.FLIP_NONE)
+			ego.Renderer.CopyEx(s.texture, s.textureRegion.SDLRect(), s.SDLRect(), s.Rotation.Get(), s.Center.SDLPoint(), s.flip)
 		})
 	}
 }
@@ -55,4 +63,14 @@ func (s *Sprite) Reset() {
 
 func (s *Sprite) Destroy() {
 	s.texture.Destroy()
+}
+
+func (s *Sprite) Flip(t int) {
+	if t == HORIZONTAL {
+		s.flip = sdl.FLIP_HORIZONTAL
+	} else if t == VERTICAL {
+		s.flip = sdl.FLIP_VERTICAL
+	} else {
+		s.flip = sdl.FLIP_NONE
+	}
 }
