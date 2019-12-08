@@ -237,6 +237,27 @@ func events() {
 		switch event.(type) {
 		case *sdl.QuitEvent:
 			Quit()
+		case *sdl.MouseMotionEvent:
+			ActiveScene.MouseMotion(event.(*sdl.MouseMotionEvent))
+		case *sdl.MouseButtonEvent:
+			ActiveScene.MouseButton(event.(*sdl.MouseButtonEvent))
+		case *sdl.MouseWheelEvent:
+			ActiveScene.MouseWheel(event.(*sdl.MouseWheelEvent))
+		case *sdl.KeyboardEvent:
+			ActiveScene.Keyboard(event.(*sdl.KeyboardEvent))
+		case *sdl.WindowEvent:
+			we := event.(*sdl.WindowEvent)
+			switch we.Event {
+			case 11:
+				fallthrough
+			case 13:
+				ActiveScene.WindowLoseFocus(we)
+			case 10:
+				fallthrough
+			case 12:
+				ActiveScene.WindowGainFocus(we)
+			}
+			//fmt.Printf("%T | %d\n", event, event.(*sdl.WindowEvent).Event)
 		}
 	}
 }

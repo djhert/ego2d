@@ -56,6 +56,10 @@ func (s *Sprite) SetTextureRegion(x, y, w, h int32) {
 	s.Center.SetXY(w/2, h/2)
 }
 
+func (s *Sprite) SetTextureRegionRect(m *math.Rect) {
+	s.textureRegion.SetXYWH(m.GetX(), m.GetY(), m.GetW(), m.GetH())
+}
+
 func (s *Sprite) Reset() {
 	s.SetTextureRegion(0, 0, 0, 0)
 	s.texture = nil

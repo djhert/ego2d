@@ -10,7 +10,6 @@ import (
 	//SDL
 	"github.com/veandco/go-sdl2/mix"
 	"github.com/veandco/go-sdl2/sdl"
-	"github.com/veandco/go-sdl2/ttf"
 
 	//SDL Libs
 	"github.com/veandco/go-sdl2/img"
@@ -32,9 +31,6 @@ var (
 
 	Sounds   map[string]*mix.Chunk
 	soundExt *regexp.Regexp
-
-	Fonts   map[string]*ttf.Font
-	fontExt *regexp.Regexp
 )
 
 func init() {
@@ -44,12 +40,9 @@ func init() {
 
 	Sounds = make(map[string]*mix.Chunk)
 
-	Fonts = make(map[string]*ttf.Font)
-
 	textureExt = regexp.MustCompile(".(jpg|gif|png|bmp|tiff)$")
 	musicExt = regexp.MustCompile(".(wav|mp3|ogg)$")
 	soundExt = regexp.MustCompile(".(wav|ogg)$")
-	fontExt = regexp.MustCompile(".(ttf)$")
 }
 
 //Textures
@@ -69,7 +62,7 @@ func LoadTexture(name, path string) error {
 		return err
 	}
 	Textures[name] = save
-	surface.Free()
+
 	return nil
 }
 
@@ -181,30 +174,8 @@ func aloadSounds() {
 	return
 }
 
-func LoadFont(name, path string, size int) error {
-	if _, ok := Fonts[name]; ok {
-		return fmt.Errorf("Duplicate Font: %s", name)
-	}
-	save, err := ttf.OpenFont(path, size)
-	if err != nil {
-		Log.LogError(2, err)
-		return err
-	}
-	Fonts[name] = save
-	return nil
-}
-
 func destroyAssets() {
 	for i := range Textures {
 		Textures[i].Texture.Destroy()
-	}
-	/*	for i := range Music {
-			Music[i].Free()
-		}
-		for i := range Sounds {
-			Sounds[i].Free()
-		}*/
-	for i := range Fonts {
-		Fonts[i].Close()
 	}
 }

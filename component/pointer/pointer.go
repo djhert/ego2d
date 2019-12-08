@@ -2,7 +2,6 @@ package pointer
 
 import (
 	"github.com/hlfstr/ego2d/component/sprite"
-	"github.com/hlfstr/ego2d/ego"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -17,12 +16,15 @@ func New() *Pointer {
 }
 
 func (p *Pointer) Start() {
-	//	sdl.SetRelativeMouseMode(true)
-	ego.ExtraDraw(p.Draw)
+	p.Focus(true)
 	p.SetWH(16, 16)
 }
 
 func (p *Pointer) Update() {
 	x, y, _ := sdl.GetMouseState()
 	p.SetXY(x, y)
+}
+
+func (p *Pointer) Focus(b bool) {
+	sdl.SetRelativeMouseMode(b)
 }
